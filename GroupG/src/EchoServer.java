@@ -36,6 +36,8 @@ public class EchoServer extends AbstractServer
 
 	private ChatIF serverUI;	
 	ArrayList<String> users;
+	ArrayList<String> accounts;
+	ArrayList<String> passwords;
 	ArrayList<String> serverMuteUsers;
 	ArrayList<String> blockedClients;
 
@@ -65,14 +67,17 @@ public class EchoServer extends AbstractServer
 		super(port);
 		serverUI = serverConsole;
 		users = new ArrayList<String>();
+		accounts = new ArrayList<String>();
+		passwords = new ArrayList<String>();
 		serverMuteUsers = new ArrayList<String>();
 		blockedClients = new ArrayList<String>();
 		Timer UpdateTimer = new Timer();
 		//Run "idol status updater" every 10 sec
 		UpdateTimer.scheduleAtFixedRate(StatusTask, 0, 10000);
-		
+		this.buildUserList(port);
+
 		setConnectionFactory(new ChatConnectionFactory());
-		
+
 		try {
 			this.listen();
 		} catch (IOException e) {
@@ -112,8 +117,10 @@ public class EchoServer extends AbstractServer
 			String cmd = GetCommand(message);
 
 			if(cmd.equals("login")){
-				String id = message.substring(message.indexOf(' ')+1, message.length());
-				boolean validLogin = LoginRecived(client, id);						
+				String[] login = message.split(" ");
+				String id = login[1];
+				String pw = login[2];
+				boolean validLogin = LoginRecived(client, id, pw);					
 			} else if (cmd.equals("block")){
 				String blockee = message.substring(message.indexOf(' ')+1, message.length());
 				NewBlock(client,blockee);
@@ -319,7 +326,7 @@ public class EchoServer extends AbstractServer
 	/**
 	 * Handles login requests from clients
 	 */
-	private boolean LoginRecived(ConnectionToClient client, String id) {
+	private boolean LoginRecived(ConnectionToClient client, String id, String pw) {
 		String clientOrigLogin = (String) client.getInfo("loginId");
 		if(clientOrigLogin != null){
 			try {
@@ -329,14 +336,22 @@ public class EchoServer extends AbstractServer
 			}
 			return false;
 		}
+		//try{
+		//Thread[] clients = this.getClientConnections();
+		//for(int i = 0; i < clients.length; i++){
+		//for (int i = 0; i < accounts.size(); i++) {
+		//if(((ConnectionToClient)clients[i]).getInfo("loginId").equals(id)){
+
+		//}
+		//} catch (RuntimeException e){} //Catches when there are no clients to getClientConnections
 		try{
 			Thread[] clients = this.getClientConnections();
 			for(int i = 0; i < clients.length; i++){
 				if(((ConnectionToClient)clients[i]).getInfo("loginId").equals(id)){
-					//User is already logged in
+					//User already existed
 					try {
-						client.sendToClient("ERROR- A user with the id: " + id + " has is already online. Awaiting Command");
-						serverUI.display("A client with duplicate loginId: " + id + " has tried to login and was refused.");
+						client.sendToClient("Error - The client " + id + " is already logged in.");
+						serverUI.display("A client, " + id + " tried to log in but " + id + " is already logged in.");
 						client.close();
 					} catch (IOException e) {
 						serverUI.display("ERROR- Unable to send login error message to client: " + id);
@@ -345,9 +360,41 @@ public class EchoServer extends AbstractServer
 				}
 			}
 		} catch (RuntimeException e){} //Catches when there are no clients to getClientConnections
+
+		if(users.contains(id)) {
+			//User already existed
+			int index = users.indexOf(id);
+			if (!pw.equals(passwords.get(index))) {
+				try {
+					client.sendToClient("Error - The password entered was incorrect. Please try again.");
+					serverUI.display("A client, " + id + " tried to log in with the wrong password.");
+					client.close();
+					return false;
+				} catch (IOException e) {
+					serverUI.display("ERROR- Unable to send login error message to client: " + id);
+				}
+
+			}else {
+
+				client.setInfo("loginId", id);
+				client.setInfo("pw", pw);
+
+				//Initially put all users into public chat
+				client.setInfo("channel", "public");
+
+				sendToChannel("public", id + " has logged on.");
+				serverUI.display(id + " has logged on.");
+
+				return  true;
+			}
+
+
+		}
 		//first unique login for client
 		client.setInfo("loginId", id);
-		users.add(id);
+		client.setInfo("pw", pw);
+
+		addUser(id, pw);
 
 		//Initially put all users into public chat
 		client.setInfo("channel", "public");
@@ -356,6 +403,16 @@ public class EchoServer extends AbstractServer
 		serverUI.display(id + " has logged on.");
 
 		return  true;
+	}
+
+	private void addUser (String id, String pw) {
+		users.add(id);
+		passwords.add(pw);
+
+		try (BufferedWriter buffer = new BufferedWriter(new FileWriter("server" + this.getPort() + ".txt", true))) {
+			buffer.write(id + " " + pw + System.getProperty("line.separator"));
+		}catch (IOException e){
+		}
 	}
 
 	private void sendToChannel(String channel, String msg) {
@@ -823,7 +880,7 @@ public class EchoServer extends AbstractServer
 
 			if(recipient.equals(sender.getInfo("loginId"))){
 				try {
-					sender.sendToClient("You acannot send a private message to yourself.");
+					sender.sendToClient("You cannot send a private message to yourself.");
 				} catch (IOException e) {
 					serverUI.display("Message could not be sent to the client.");
 				}
@@ -831,13 +888,20 @@ public class EchoServer extends AbstractServer
 			}
 			if(!UserExists(recipient)){
 				try {
-					sender.sendToClient("You acannot send a private message to a user that does not exist.");
+					sender.sendToClient("You cannot send a private message to a user that does not exist.");
 				} catch (IOException e) {
 					serverUI.display("Message could not be sent to the client.");
 				}
 				return;
 			}
-
+			if(GetClientConnection(recipient).getInfo("status").equals("notavailable")) {
+				try {
+					sender.sendToClient("Cannot send message because " + recipient + " is not available.");
+				} catch (IOException e) {
+					serverUI.display("Message could not be sent to the client.");
+				}
+				return;
+			}
 			String msg = message.substring(endIndex +1);
 			msg = "(Private) " + msg;
 			if (isBlocking (recipient, (String) sender.getInfo("loginId"))) {
@@ -927,7 +991,25 @@ public class EchoServer extends AbstractServer
 			return false;
 		}
 	}
-
+	private void buildUserList(int port) {
+		File file = new File("server" + this.getPort() + ".txt");
+		try {
+			if(!file.createNewFile()) {
+				try (BufferedReader buffer = new BufferedReader(new FileReader("server" + port + ".txt"))) {
+					String current;
+					while ((current = buffer.readLine()) != null) {
+						String[] user = current.split(" ");
+						users.add(user[0]);
+						passwords.add(user[1]);
+					}
+				}catch (IOException e){
+				}
+			}
+		} catch (IOException e) {
+			serverUI.display("Error - Could not creat account file.");
+		}
+	}
+	
 	public static void main(String[] args) 
 	{
 		//Get port
