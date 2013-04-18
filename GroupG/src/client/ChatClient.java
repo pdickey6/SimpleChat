@@ -55,7 +55,7 @@ public class ChatClient extends AbstractClient
 		super(host, port); //Call the superclass constructor
 		clientUI = UI;
 		loginId = id;
-		isForwarding = false;		
+		isForwarding = false;			
 
 		openConnection();
 		try {

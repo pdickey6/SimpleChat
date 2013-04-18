@@ -70,6 +70,9 @@ public class EchoServer extends AbstractServer
 		Timer UpdateTimer = new Timer();
 		//Run "idol status updater" every 10 sec
 		UpdateTimer.scheduleAtFixedRate(StatusTask, 0, 10000);
+		
+		setConnectionFactory(new ChatConnectionFactory());
+		
 		try {
 			this.listen();
 		} catch (IOException e) {
