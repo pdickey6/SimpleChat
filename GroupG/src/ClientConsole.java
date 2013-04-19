@@ -4,6 +4,11 @@
 //Edited by Patrick Dickey and Sean Jergensen
 
 import java.io.*;
+import java.util.Observable;
+import java.util.Observer;
+
+import javax.swing.SwingUtilities;
+
 import client.*;
 import common.*;
 
@@ -17,7 +22,7 @@ import common.*;
  * @author Dr Robert Lagani&egrave;re
  * @version July 2000
  */
-public class ClientConsole implements ChatIF 
+public class ClientConsole implements Observer 
 {
 	//Class variables *************************************************
 
@@ -53,6 +58,7 @@ public class ClientConsole implements ChatIF
 			System.out.println("Cannot open connection. Awaiting command.");
 			//System.exit(1);
 		}
+		client.addObserver(this);
 	}
 
 
@@ -86,16 +92,6 @@ public class ClientConsole implements ChatIF
 		}
 	}
 
-	/**
-	 * This method overrides the method in the ChatIF interface.  It
-	 * displays a message onto the screen.
-	 *
-	 * @param message The string to be displayed.
-	 */
-	public void display(String message) 
-	{
-		System.out.println(message);
-	}
 
 	//Class methods ***************************************************
 
@@ -142,6 +138,14 @@ public class ClientConsole implements ChatIF
 
 		ClientConsole chat= new ClientConsole(id, pw, host, port);
 		chat.accept();  //Wait for console data
+	}
+
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if(arg instanceof String){
+			System.out.println( arg.toString());
+		}		
 	}
 
 }

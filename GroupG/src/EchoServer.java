@@ -23,7 +23,7 @@ import common.ChatIF;
  * @author Paul Holden
  * @version July 2000
  */
-public class EchoServer extends AbstractServer 
+public class EchoServer extends ObservableServer 
 {
 	//Class variables *************************************************
 
@@ -76,7 +76,7 @@ public class EchoServer extends AbstractServer
 		UpdateTimer.scheduleAtFixedRate(StatusTask, 0, 10000);
 		this.buildUserList(port);
 
-		setConnectionFactory(new ChatConnectionFactory());
+		//setConnectionFactory(new ChatConnectionFactory());
 
 		try {
 			this.listen();
@@ -170,7 +170,7 @@ public class EchoServer extends AbstractServer
 			//Switch based on user command
 			switch (cmd) {
 			case "quit" :
-				if(!isClosed()){
+				/*if(!){
 					try {
 						//send msg before closing
 						sendToAllClients("WARNING - The server has closed. Awaiting command.");
@@ -178,7 +178,7 @@ public class EchoServer extends AbstractServer
 					} catch (IOException e) {
 						serverUI.display("Unable to close.");
 					}
-				}
+				}*/
 				System.exit(0);
 
 				break;
@@ -190,9 +190,9 @@ public class EchoServer extends AbstractServer
 				}
 				break;
 			case "close" :
-				if(isClosed())
+/*				if(isClosed())
 					serverUI.display("Server is already closed");
-				else {
+				else {*/
 					try{
 						sendToAllClients("SERVER SHUTTING DOWN! DISCONNECTING!");
 						sendToAllClients("Abnormal termination of connection");
@@ -200,19 +200,15 @@ public class EchoServer extends AbstractServer
 					} catch (IOException e){
 						serverUI.display("Unable to close.");
 					}
-				}
+				/*}*/
 				break;
 			case "setport" :
-				if(!isClosed())
-					serverUI.display("Can not set port untill the server is closed.");
-				else {
-					try{
-						int port = Integer.parseInt(message.substring(cmdEnd +1, message.length()));
-						setPort(port);
-						serverUI.display("Port set to: " + port);
-					}catch (NumberFormatException e){
-						serverUI.display("Port could not be set");
-					}	
+				try{
+					int port = Integer.parseInt(message.substring(cmdEnd +1, message.length()));
+					setPort(port);
+					serverUI.display("Port set to: " + port);
+				}catch (NumberFormatException e){
+					serverUI.display("Port could not be set");
 				}
 				break;
 			case "start" :

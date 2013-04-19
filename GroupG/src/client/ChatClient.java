@@ -9,6 +9,7 @@ import com.lloseng.ocsf.client.*;
 import common.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Observer;
 
 /**
  * This class overrides some of the methods defined in the abstract
@@ -19,7 +20,7 @@ import java.util.ArrayList;
  * @author Fran&ccedil;ois B&eacute;langer
  * @version July 2000
  */
-public class ChatClient extends AbstractClient
+public class ChatClient extends ObservableClient
 {
 	//Instance variables **********************************************
 
@@ -27,7 +28,7 @@ public class ChatClient extends AbstractClient
 	 * The interface type variable.  It allows the implementation of 
 	 * the display method in the client.
 	 */
-	private ChatIF clientUI;
+	private Observer clientUI;
 	private String loginId;
 	private String password;
 	private String monitor;
@@ -43,25 +44,26 @@ public class ChatClient extends AbstractClient
 	 * @param port The port number to connect on.
 	 * @param clientUI The interface type variable.
 	 */  
-	public ChatClient(ChatIF UI){
+	public ChatClient(Observer UI){
 		super("localhost",5555);
 		clientUI = UI;
 		connected = false;
 		isForwarding = false;
 	}
 
-	public ChatClient(String id, String pw, String host, int port, ChatIF UI) throws IOException {
+	public ChatClient(String id, String pw, String host, int port, Observer UI) throws IOException {
 		super(host, port); //Call the superclass constructor
 		clientUI = UI;
 		loginId = id;
 		password = pw;
-		isForwarding = false;			
-
+		isForwarding = false;
+		
 		openConnection();
 		try {
 			sendToServer("#login " + loginId + " " + password);
 		} catch (IOException e) {
-			clientUI.display("ERROR - No login ID specified. Connection aborted.");
+			notifyObservers("ERROR - No login ID specified. Connection aborted.");
+			//clientUI.display("ERROR - No login ID specified. Connection aborted.");
 		}
 	}
 
@@ -77,14 +79,17 @@ public class ChatClient extends AbstractClient
 	{
 		String message = msg.toString();
 		if(!message.startsWith("#")){
-			if(!isForwarding)
-				clientUI.display(message);
+			if(!isForwarding){
+				setChanged();
+				notifyObservers(message);
+			}
 			else {
 				//In meeting so forward msg to monitor
-				try {
+				try {					
 					sendToServer("#forward_message " + monitor + " " + message);
 				} catch (IOException e) {
-					clientUI.display("Unable to forward message to server.");
+					setChanged();
+					notifyObservers("Unable to forward message to server.");
 				}
 			}
 		} else { //command
@@ -99,40 +104,48 @@ public class ChatClient extends AbstractClient
 			case "meeting":
 				monitor = message.substring(cmdEnd+1);
 				isForwarding = true;
-				clientUI.display("In meeting: " + monitor + " will now receive your messages. When you return type #endmeeting to cancel forwarding.");
+				setChanged();
+				
+				notifyObservers("In meeting: " + monitor + " will now receive your messages. When you return type #endmeeting to cancel forwarding.");
 				break;
 			case "forward":
 				monitor = message.substring(cmdEnd+1);
 				isForwarding = true;
-				clientUI.display("Forwarding: " + monitor + " will now receive your messages. When you return type #endforward to cancel forwarding.");
+				setChanged();
+				notifyObservers("Forwarding: " + monitor + " will now receive your messages. When you return type #endforward to cancel forwarding.");
 				break;
 			case "endforward":
 				if (isForwarding) {
 					isForwarding = false;
-					clientUI.display("No longer forwarding messages to " + monitor + ".");
+					setChanged();
+					notifyObservers("End Forwarding: No longer forwarding messages to " + monitor + ".");
 					monitor = "";
 					break;
 				} else {
-					clientUI.display("Error: You were not forwarding messages.");
+					notifyObservers("Error: You were not forwarding messages.");
 					break;
 				}
 			case "forwardblocked":
 				isForwarding = false;
-				clientUI.display("Forwarding to " + monitor + " has been canceled because " + monitor + " is blocking messages from you.");
+				setChanged();
+				notifyObservers("Forwarding to " + monitor + " has been canceled because " + monitor + " is blocking messages from you.");
 				monitor = "";
 				break;
 			case "endmeeting":
 				if (isForwarding) {
 					isForwarding = false;
-					clientUI.display("No longer forwarding messages to " + monitor + ".");
+					setChanged();
+					notifyObservers("End Forwarding: No longer forwarding messages to " + monitor + ".");
 					monitor = "";
 					break;
 				} else {
-					clientUI.display("Error: You were not forwarding messages.");
+					setChanged();
+					notifyObservers("Error: You were not forwarding messages.");
 					break;
 				}
 			default:
-				clientUI.display("Command from server not recognized. " + cmd);
+				setChanged();
+				notifyObservers("Command from server not recognized. " + cmd);
 			}
 		}
 	}
@@ -149,7 +162,8 @@ public class ChatClient extends AbstractClient
 			try {
 				sendToServer(message);
 			} catch(IOException e) {
-				clientUI.display("Could not send message to server. Terminating client.");
+				setChanged();
+				notifyObservers("Could not send message to server. Terminating client.");
 				quit();
 			}
 		} else { //command
@@ -164,108 +178,130 @@ public class ChatClient extends AbstractClient
 				quit();
 				break;
 			case "logoff" :
-				if(!connected)
-					clientUI.display("You are already logged off.");
+				if(!connected){
+					setChanged();
+					notifyObservers("You are already logged off.");
+				}
 				else {
 					try {
 						closeConnection();
 						connected = false;
-						clientUI.display("Connection closed.");
+						setChanged();
+						notifyObservers("Connection closed.");
 					} catch (IOException e) {
-						clientUI.display("Unable to logoff.");
+						setChanged();
+						notifyObservers("Unable to logoff.");
 					}
 				}
 				break;
 			case "login" :
 				if(connected)
-					clientUI.display("You are already logged in.");
+					notifyObservers("You are already logged in.");
 				else {
 					try {
 						openConnection();
 						sendToServer("#login " + loginId);
 						connected = true;
 					} catch (IOException e) {
-						clientUI.display("Unable to login.");
+						setChanged();
+						notifyObservers("Unable to login.");
 					}
 				}
 				break;
 			case "sethost" :
-				if(connected)
-					clientUI.display("Cannot set host while connected to server.");
+				if(connected){
+					setChanged();
+					notifyObservers("Cannot set host while connected to server.");
+					}
 				else {
 					String host = message.substring(cmdEnd +1, message.length());
 					if(host.length() > 0 ) {
 						setHost(host);
-						clientUI.display("Host set to: " + host);
+						setChanged();
+						notifyObservers("Host set to: " + host);
 					} else {
-						clientUI.display("Host could not be set");
+						setChanged();
+						notifyObservers("Host could not be set");
 					}
 				}
 				break;
 			case "setport" :
-				if(connected)
-					clientUI.display("Cannot set port while connected to server.");
+				if(connected){
+					setChanged();
+					notifyObservers("Cannot set port while connected to server.");
+				}
 				else {
 					try{
 						int port = Integer.parseInt(message.substring(cmdEnd +1, message.length()));
 						setPort(port);
-						clientUI.display("Port set to: " + port);
+						setChanged();
+						notifyObservers("Port set to: " + port);
 					}catch (NumberFormatException e){
-						clientUI.display("Port could not be set");
+						setChanged();
+						notifyObservers("Port could not be set");
 					}					
 				}
 				break;
 			case "gethost" :
-				clientUI.display("Current Host: " + getHost());				
+				setChanged();
+				notifyObservers("Current Host: " + getHost());				
 				break;
 			case "getport" :
-				clientUI.display("Current Port: " + getPort());				
+				setChanged();
+				notifyObservers("Current Port: " + getPort());				
 				break;
 			case "block" :
 				try{
 					sendToServer(message);
 
 				} catch (IOException e) {
-					clientUI.display("Messages could not be blocked.");
+					setChanged();
+					notifyObservers("Messages could not be blocked.");
 				}
 				break;
 			case "unblock" :
 				try {
 					sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Messages could not be unblocked.");
+					setChanged();
+					notifyObservers("Messages could not be unblocked.");
 				}
 				break;
 			case "whoiblock" :
 				try{
 					sendToServer(message);
 				} catch (IOException e){
-					clientUI.display("Could not get list of blocked users.");
+					setChanged();
+					notifyObservers("Could not get list of blocked users.");
 				}
 				break;
 			case "whoblocksme" :
 				try {
 					sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Block list could not be retrived.");
+					setChanged();
+					notifyObservers("Block list could not be retrived.");
 				}
 				break;
 			case "setchannel":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Channel could not be set.");
+					setChanged();
+					notifyObservers("Channel could not be set.");
 				}
 				break;
 			case "private":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Could not send private message.");
+					setChanged();
+					notifyObservers("Could not send private message.");
 				}
 				break;
 			case "meeting" :
 				try {sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Could not initiate meeting.");
+					setChanged();
+					notifyObservers("Could not initiate meeting.");
 				}				
 				break;
 			case "endmeeting":
@@ -274,35 +310,41 @@ public class ChatClient extends AbstractClient
 			case "status":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Status could not be set.");
+					setChanged();
+					notifyObservers("Status could not be set.");
 				}
 				break;
 			case "available":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Could not change status.");
+					setChanged();
+					notifyObservers("Could not change status.");
 				}				
 				break;
 			case "notavailable":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Could not change status.");
+					setChanged();
+					notifyObservers("Could not change status.");
 				}	
 				break;
 			case "forward":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Could not forward messages.");
+					setChanged();
+					notifyObservers("Could not forward messages.");
 				}	
 				break;
 			case "endforward":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					clientUI.display("Could not stop forwarding messages.");
+					setChanged();
+					notifyObservers("Could not stop forwarding messages.");
 				}
 				break;
 			default: 
-				clientUI.display("Command not recognized.");
+				setChanged();
+				notifyObservers("Command not recognized.");
 			}
 		}
 	}
@@ -312,7 +354,7 @@ public class ChatClient extends AbstractClient
 	 */
 	protected void connectionException(){
 		connected = false;
-		clientUI.display("Abnormal termination of connection");
+		notifyObservers("Abnormal termination of connection");
 	}
 
 	/**
