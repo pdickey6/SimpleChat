@@ -58,11 +58,9 @@ public class GUI implements Observer{
 	private javax.swing.JPanel BlockSettingsTab;
 	private javax.swing.JPanel ServerSettingsTab;
 	private javax.swing.JScrollPane ChatDisplay;
-	private javax.swing.JScrollPane jScrollPane2;
 	private javax.swing.JTabbedPane MainWindowTabs;
 	private javax.swing.JTabbedPane SettingsWindowTabs;
 	private javax.swing.JTextArea MessageDisplay;
-	private javax.swing.JTextArea UserList;
 	private javax.swing.JTextField MessageInput;
 	private javax.swing.JTextField ForwardTo;
 	private javax.swing.JTextField ChannelToSetTo;
@@ -97,7 +95,7 @@ public class GUI implements Observer{
 
 	private void SetupUI(String loginID) {
 
-		chatFrame = new JFrame("Chat" + loginID);
+		chatFrame = new JFrame("Chat " + loginID);
 		MainWindowTabs = new javax.swing.JTabbedPane();
 		ChatWindow = new javax.swing.JPanel();
 		ChatDisplay = new javax.swing.JScrollPane();
@@ -114,8 +112,6 @@ public class GUI implements Observer{
 		UserToChangeBlock = new javax.swing.JTextField();
 		BlockButton = new javax.swing.JButton();
 		UnblockButton = new javax.swing.JButton();
-		jScrollPane2 = new javax.swing.JScrollPane();
-		UserList = new javax.swing.JTextArea();
 		WhoIBlockButton = new javax.swing.JButton();
 		WhoBlocksMeButton = new javax.swing.JButton();
 		ServerSettingsTab = new javax.swing.JPanel();
@@ -146,11 +142,6 @@ public class GUI implements Observer{
 		MessageInput.setBackground(new java.awt.Color(127, 140, 141));
 		MessageInput.setText("Message");
 		MessageInput.setToolTipText("");
-		MessageInput.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jTextField1ActionPerformed(evt);
-			}
-		});
 
 		Send.setText("Send");
 
@@ -202,19 +193,9 @@ public class GUI implements Observer{
 
 		ForwardTo.setBackground(new java.awt.Color(127, 140, 141));
 		ForwardTo.setText("Name of User to Forward to");
-		ForwardTo.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jTextField2ActionPerformed(evt);
-			}
-		});
 
 		ChannelToSetTo.setBackground(new java.awt.Color(127, 140, 141));
 		ChannelToSetTo.setText("Channel to Connect");
-		ChannelToSetTo.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jTextField3ActionPerformed(evt);
-			}
-		});
 
 		ForwardButton.setText("Forward");
 
@@ -260,51 +241,41 @@ public class GUI implements Observer{
 
 		UnblockButton.setText("Unblock");
 
-		UserList.setBackground(new java.awt.Color(127, 140, 141));
-		UserList.setColumns(20);
-		UserList.setRows(5);
-		UserList.setText("List of Users");
-		jScrollPane2.setViewportView(UserList);
-
 		WhoIBlockButton.setText("Blocked Users");
 
 		WhoBlocksMeButton.setText("Who Blocks Me?");
 
 		javax.swing.GroupLayout gl_BlockSettingsTab = new javax.swing.GroupLayout(BlockSettingsTab);
-		BlockSettingsTab.setLayout(gl_BlockSettingsTab);
 		gl_BlockSettingsTab.setHorizontalGroup(
-				gl_BlockSettingsTab.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+			gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_BlockSettingsTab.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(gl_BlockSettingsTab.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-								.addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-								.addComponent(UserToChangeBlock))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(gl_BlockSettingsTab.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-										.addComponent(WhoIBlockButton, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
-										.addComponent(BlockButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-										.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(gl_BlockSettingsTab.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-												.addComponent(WhoBlocksMeButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-												.addComponent(UnblockButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-												.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-				);
+					.addContainerGap()
+					.addComponent(UserToChangeBlock, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(WhoIBlockButton, 0, 0, Short.MAX_VALUE)
+						.addComponent(BlockButton, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(UnblockButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(WhoBlocksMeButton, GroupLayout.PREFERRED_SIZE, 133, Short.MAX_VALUE))
+					.addContainerGap(117, Short.MAX_VALUE))
+		);
 		gl_BlockSettingsTab.setVerticalGroup(
-				gl_BlockSettingsTab.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+			gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_BlockSettingsTab.createSequentialGroup()
-						.addContainerGap()
-						.addGroup(gl_BlockSettingsTab.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-								.addComponent(UserToChangeBlock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addComponent(BlockButton)
-								.addComponent(UnblockButton))
-								.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(gl_BlockSettingsTab.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-										.addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addGroup(gl_BlockSettingsTab.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(WhoIBlockButton)
-												.addComponent(WhoBlocksMeButton)))
-												.addContainerGap(228, Short.MAX_VALUE))
-				);
+					.addContainerGap()
+					.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.BASELINE)
+						.addComponent(UserToChangeBlock, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(BlockButton)
+						.addComponent(UnblockButton))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.BASELINE)
+						.addComponent(WhoIBlockButton)
+						.addComponent(WhoBlocksMeButton))
+					.addContainerGap(367, Short.MAX_VALUE))
+		);
+		BlockSettingsTab.setLayout(gl_BlockSettingsTab);
 
 		SettingsWindowTabs.addTab("Block", BlockSettingsTab);
 
@@ -317,11 +288,6 @@ public class GUI implements Observer{
 
 		PortInput.setBackground(new java.awt.Color(127, 140, 141));
 		PortInput.setText("Port");
-		PortInput.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				jTextField6ActionPerformed(evt);
-			}
-		});
 
 		SetPortButton.setText("Set Port");
 		GetHost = new JButton("Get Host");
@@ -424,7 +390,7 @@ public class GUI implements Observer{
 		SetChannelButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String command = SetChannelButton.getActionCommand();
-				if(command == "Channel"){
+				if(command == "Set Channel"){
 					//get new channel
 					String channel = ChannelToSetTo.getText();
 					if(channel.length() > 0 ){
@@ -490,7 +456,7 @@ public class GUI implements Observer{
 		WhoIBlockButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String command = WhoIBlockButton.getActionCommand();
-				if(command == "My Blocks"){
+				if(command == "Blocked Users"){
 					client.handleMessageFromClientUI("#whoiblock");
 					MainWindowTabs.setSelectedIndex(0);
 				}
@@ -500,7 +466,7 @@ public class GUI implements Observer{
 		WhoBlocksMeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String command = WhoBlocksMeButton.getActionCommand();
-				if(command == "Blocks Me"){
+				if(command == "Who Blocks Me?"){
 					client.handleMessageFromClientUI("#whoblocksme");
 					MainWindowTabs.setSelectedIndex(0);
 				}
@@ -546,7 +512,7 @@ public class GUI implements Observer{
 						ForwardTo.setText("");
 						MainWindowTabs.setSelectedIndex(0);
 					}
-				} else if (command == "Return"){
+				} else if (command == "Stop Forwarding"){
 					client.handleMessageFromClientUI("#endforward");
 				}
 			}
@@ -582,6 +548,8 @@ public class GUI implements Observer{
 				}
 			}
 		});
+		
+
 
 
 
@@ -589,22 +557,6 @@ public class GUI implements Observer{
 		chatFrame.pack();
 		chatFrame.setVisible(true);
 	}// </editor-fold>//GEN-END:initComponents
-
-	private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-		// TODO add your handling code here:
-	}//GEN-LAST:event_jTextField1ActionPerformed
-
-	private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
-		// TODO add your handling code here:
-	}//GEN-LAST:event_jTextField2ActionPerformed
-
-	private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
-		// TODO add your handling code here:
-	}//GEN-LAST:event_jTextField3ActionPerformed
-
-	private void jTextField6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField6ActionPerformed
-		// TODO add your handling code here:
-	}//GEN-LAST:event_jTextField6ActionPerformed
 
 	/**
 	 * @param args the command line arguments
@@ -669,11 +621,10 @@ public class GUI implements Observer{
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		// TODO Auto-generated method stub
 		if(arg1 instanceof String){
 			String message = arg1.toString();
 			if(message.startsWith("Forwarding: ")){
-				ForwardButton.setText("Return");
+				ForwardButton.setText("Stop Forwarding");
 				SetChannelButton.setEnabled(false);
 				BlockButton.setEnabled(false);
 				Send.setEnabled(false);
