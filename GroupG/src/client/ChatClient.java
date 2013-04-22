@@ -57,19 +57,22 @@ public class ChatClient extends ObservableClient
 		loginId = id;
 		password = pw;
 		isForwarding = false;
-		
+
 		openConnection();
 		try {
 			sendToServer("#login " + loginId + " " + password);
 		} catch (IOException e) {
-			notifyObservers("ERROR - No login ID specified. Connection aborted.");
+			NotifyObservers("ERROR - No login ID specified. Connection aborted.");
 			//clientUI.display("ERROR - No login ID specified. Connection aborted.");
 		}
 	}
 
 
 	//Instance methods ************************************************
-
+	private void NotifyObservers(String message) {
+		setChanged();
+		notifyObservers(message);		
+	}
 	/**
 	 * This method handles all data that comes in from the server.
 	 *
@@ -80,16 +83,14 @@ public class ChatClient extends ObservableClient
 		String message = msg.toString();
 		if(!message.startsWith("#")){
 			if(!isForwarding){
-				setChanged();
-				notifyObservers(message);
+				NotifyObservers(message);
 			}
 			else {
 				//In meeting so forward msg to monitor
 				try {					
 					sendToServer("#forward_message " + monitor + " " + message);
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Unable to forward message to server.");
+					NotifyObservers("Unable to forward message to server.");
 				}
 			}
 		} else { //command
@@ -104,48 +105,40 @@ public class ChatClient extends ObservableClient
 			case "meeting":
 				monitor = message.substring(cmdEnd+1);
 				isForwarding = true;
-				setChanged();
-				
-				notifyObservers("In meeting: " + monitor + " will now receive your messages. When you return type #endmeeting to cancel forwarding.");
+				NotifyObservers("In meeting: " + monitor + " will now receive your messages. When you return type #endmeeting to cancel forwarding.");
 				break;
 			case "forward":
 				monitor = message.substring(cmdEnd+1);
 				isForwarding = true;
-				setChanged();
-				notifyObservers("Forwarding: " + monitor + " will now receive your messages. When you return type #endforward to cancel forwarding.");
+				NotifyObservers("Forwarding: " + monitor + " will now receive your messages. When you return type #endforward to cancel forwarding.");
 				break;
 			case "endforward":
 				if (isForwarding) {
 					isForwarding = false;
-					setChanged();
-					notifyObservers("End Forwarding: No longer forwarding messages to " + monitor + ".");
+					NotifyObservers("End Forwarding: No longer forwarding messages to " + monitor + ".");
 					monitor = "";
 					break;
 				} else {
-					notifyObservers("Error: You were not forwarding messages.");
+					NotifyObservers("Error: You were not forwarding messages.");
 					break;
 				}
 			case "forwardblocked":
 				isForwarding = false;
-				setChanged();
-				notifyObservers("Forwarding to " + monitor + " has been canceled because " + monitor + " is blocking messages from you.");
+				NotifyObservers("Forwarding to " + monitor + " has been canceled because " + monitor + " is blocking messages from you.");
 				monitor = "";
 				break;
 			case "endmeeting":
 				if (isForwarding) {
 					isForwarding = false;
-					setChanged();
-					notifyObservers("End Forwarding: No longer forwarding messages to " + monitor + ".");
+					NotifyObservers("End Forwarding: No longer forwarding messages to " + monitor + ".");
 					monitor = "";
 					break;
 				} else {
-					setChanged();
-					notifyObservers("Error: You were not forwarding messages.");
+					NotifyObservers("Error: You were not forwarding messages.");
 					break;
 				}
 			default:
-				setChanged();
-				notifyObservers("Command from server not recognized. " + cmd);
+				NotifyObservers("Command from server not recognized. " + cmd);
 			}
 		}
 	}
@@ -162,8 +155,7 @@ public class ChatClient extends ObservableClient
 			try {
 				sendToServer(message);
 			} catch(IOException e) {
-				setChanged();
-				notifyObservers("Could not send message to server. Terminating client.");
+				NotifyObservers("Could not send message to server. Terminating client.");
 				quit();
 			}
 		} else { //command
@@ -179,129 +171,110 @@ public class ChatClient extends ObservableClient
 				break;
 			case "logoff" :
 				if(!connected){
-					setChanged();
-					notifyObservers("You are already logged off.");
+					NotifyObservers("You are already logged off.");
 				}
 				else {
 					try {
 						closeConnection();
 						connected = false;
-						setChanged();
-						notifyObservers("Connection closed.");
+						NotifyObservers("Connection closed.");
 					} catch (IOException e) {
-						setChanged();
-						notifyObservers("Unable to logoff.");
+						NotifyObservers("Unable to logoff.");
 					}
 				}
 				break;
 			case "login" :
 				if(connected)
-					notifyObservers("You are already logged in.");
+					NotifyObservers("You are already logged in.");
 				else {
 					try {
 						openConnection();
 						sendToServer("#login " + loginId);
 						connected = true;
 					} catch (IOException e) {
-						setChanged();
-						notifyObservers("Unable to login.");
+						NotifyObservers("Unable to login.");
 					}
 				}
 				break;
 			case "sethost" :
 				if(connected){
-					setChanged();
-					notifyObservers("Cannot set host while connected to server.");
-					}
+					NotifyObservers("Cannot set host while connected to server.");
+				}
 				else {
 					String host = message.substring(cmdEnd +1, message.length());
 					if(host.length() > 0 ) {
 						setHost(host);
-						setChanged();
-						notifyObservers("Host set to: " + host);
+						NotifyObservers("Host set to: " + host);
 					} else {
-						setChanged();
-						notifyObservers("Host could not be set");
+						NotifyObservers("Host could not be set");
 					}
 				}
 				break;
 			case "setport" :
 				if(connected){
-					setChanged();
-					notifyObservers("Cannot set port while connected to server.");
+					NotifyObservers("Cannot set port while connected to server.");
 				}
 				else {
 					try{
 						int port = Integer.parseInt(message.substring(cmdEnd +1, message.length()));
 						setPort(port);
-						setChanged();
-						notifyObservers("Port set to: " + port);
+						NotifyObservers("Port set to: " + port);
 					}catch (NumberFormatException e){
-						setChanged();
-						notifyObservers("Port could not be set");
+						NotifyObservers("Port could not be set");
 					}					
 				}
 				break;
 			case "gethost" :
-				setChanged();
-				notifyObservers("Current Host: " + getHost());				
+				NotifyObservers("Current Host: " + getHost());				
 				break;
 			case "getport" :
-				setChanged();
-				notifyObservers("Current Port: " + getPort());				
+
+				NotifyObservers("Current Port: " + getPort());				
 				break;
 			case "block" :
 				try{
 					sendToServer(message);
-
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Messages could not be blocked.");
+					NotifyObservers("Messages could not be blocked.");
 				}
 				break;
 			case "unblock" :
 				try {
 					sendToServer(message);
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Messages could not be unblocked.");
+					NotifyObservers("Messages could not be unblocked.");
 				}
 				break;
 			case "whoiblock" :
 				try{
 					sendToServer(message);
 				} catch (IOException e){
-					setChanged();
-					notifyObservers("Could not get list of blocked users.");
+					NotifyObservers("Could not get list of blocked users.");
 				}
 				break;
 			case "whoblocksme" :
 				try {
 					sendToServer(message);
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Block list could not be retrived.");
+					NotifyObservers("Block list could not be retrived.");
 				}
 				break;
 			case "setchannel":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Channel could not be set.");
+					NotifyObservers("Channel could not be set.");
 				}
 				break;
 			case "private":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Could not send private message.");
+					NotifyObservers("Could not send private message.");
 				}
 				break;
 			case "meeting" :
 				try {sendToServer(message);
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Could not initiate meeting.");
+					NotifyObservers("Could not initiate meeting.");
 				}				
 				break;
 			case "endmeeting":
@@ -310,41 +283,35 @@ public class ChatClient extends ObservableClient
 			case "status":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Status could not be set.");
+					NotifyObservers("Status could not be set.");
 				}
 				break;
 			case "available":
 				try {sendToServer(message);
-				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Could not change status.");
+				} catch (IOException e) {					
+					NotifyObservers("Could not change status.");
 				}				
 				break;
 			case "notavailable":
 				try {sendToServer(message);
-				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Could not change status.");
+				} catch (IOException e) {					
+					NotifyObservers("Could not change status.");
 				}	
 				break;
 			case "forward":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Could not forward messages.");
+					NotifyObservers("Could not forward messages.");
 				}	
 				break;
 			case "endforward":
 				try {sendToServer(message);
 				} catch (IOException e) {
-					setChanged();
-					notifyObservers("Could not stop forwarding messages.");
+					NotifyObservers("Could not stop forwarding messages.");
 				}
 				break;
-			default: 
-				setChanged();
-				notifyObservers("Command not recognized.");
+			default: 				
+				NotifyObservers("Command not recognized.");
 			}
 		}
 	}
@@ -354,7 +321,7 @@ public class ChatClient extends ObservableClient
 	 */
 	protected void connectionException(){
 		connected = false;
-		notifyObservers("Abnormal termination of connection");
+		NotifyObservers("Abnormal termination of connection");
 	}
 
 	/**

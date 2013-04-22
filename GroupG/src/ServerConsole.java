@@ -1,9 +1,12 @@
 //Edited by Patrick Dickey and Sean Jergensen
 
 import java.io.*;
+import java.util.Observable;
+import java.util.Observer;
+
 import common.*;
 
-public class ServerConsole implements ChatIF{
+public class ServerConsole implements Observer{
 
 	//Class variables *************************************************
 	final public static int DEFAULT_PORT = 5555;
@@ -14,19 +17,15 @@ public class ServerConsole implements ChatIF{
 	//Constructors **********************************************
 	public ServerConsole(){
 		server = new EchoServer(DEFAULT_PORT, this);
+		server.addObserver(this);
 	}
 
 	public ServerConsole(int port) 
 	{
 		server = new EchoServer(port, this);
+		server.addObserver(this);
 	}
 	
-	//Instance methods ************************************************
-	@Override
-	public void display(String message) {
-		System.out.println(message);
-	}
-
 	/**
 	 * This method waits for input from the console.  Once it is 
 	 * received, it sends it to the client's message handler.
@@ -63,5 +62,12 @@ public class ServerConsole implements ChatIF{
 		
 		ServerConsole server = new ServerConsole(port);
 		server.accept();  //Wait for console data
+	}
+
+	@Override
+	public void update(Observable arg0, Object arg) {
+		if(arg instanceof String){
+			System.out.println( arg.toString());
+		}		
 	}
 }

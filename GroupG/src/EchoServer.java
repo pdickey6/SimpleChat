@@ -6,6 +6,7 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -34,7 +35,7 @@ public class EchoServer extends ObservableServer
 
 	//Instance variables *************************************************
 
-	private ChatIF serverUI;	
+	private Observer serverUI;	
 	ArrayList<String> users;
 	ArrayList<String> accounts;
 	ArrayList<String> passwords;
@@ -62,7 +63,7 @@ public class EchoServer extends ObservableServer
 
 	//Constructor ****************************************************
 
-	public EchoServer(int port, ChatIF serverConsole) 
+	public EchoServer(int port, Observer serverConsole) 
 	{
 		super(port);
 		serverUI = serverConsole;
@@ -81,11 +82,16 @@ public class EchoServer extends ObservableServer
 		try {
 			this.listen();
 		} catch (IOException e) {
-			serverUI.display("Unable to start listening!");
+			NotifyObservers("Unable to start listening!");
 		} 
 	}
 
 	//Instance methods ************************************************
+
+	private void NotifyObservers(String message) {
+		setChanged();
+		notifyObservers(message);		
+	}
 
 	/**
 	 * This method handles any messages received from the client.
@@ -106,7 +112,7 @@ public class EchoServer extends ObservableServer
 			return;
 		}
 		else{
-			serverUI.display("Message received: " + message + " from " + client.getInfo("loginId"));
+			NotifyObservers("Message received: " + message + " from " + client.getInfo("loginId"));
 		}
 
 		if(!message.startsWith("#")){ 
@@ -159,7 +165,7 @@ public class EchoServer extends ObservableServer
 	 */
 	public void handleMessageFromServerUI(String message) {
 		if(!message.startsWith("#")) {//Server Msg			
-			serverUI.display(message);
+			NotifyObservers(message);
 			SendToServerFriendlyClients("SERVER MSG> " + message);
 		} else {
 			int cmdEnd = message.indexOf(' ');
@@ -176,7 +182,7 @@ public class EchoServer extends ObservableServer
 						sendToAllClients("WARNING - The server has closed. Awaiting command.");
 						close();
 					} catch (IOException e) {
-						serverUI.display("Unable to close.");
+						NotifyObservers("Unable to close.");
 					}
 				}*/
 				System.exit(0);
@@ -184,21 +190,21 @@ public class EchoServer extends ObservableServer
 				break;
 			case "stop" :
 				if(!isListening())
-					serverUI.display("Server is already stopped.");
+					NotifyObservers("Server is already stopped.");
 				else {
 					stopListening();
 				}
 				break;
 			case "close" :
 /*				if(isClosed())
-					serverUI.display("Server is already closed");
+					NotifyObservers("Server is already closed");
 				else {*/
 					try{
 						sendToAllClients("SERVER SHUTTING DOWN! DISCONNECTING!");
 						sendToAllClients("Abnormal termination of connection");
 						close();
 					} catch (IOException e){
-						serverUI.display("Unable to close.");
+						NotifyObservers("Unable to close.");
 					}
 				/*}*/
 				break;
@@ -206,44 +212,44 @@ public class EchoServer extends ObservableServer
 				try{
 					int port = Integer.parseInt(message.substring(cmdEnd +1, message.length()));
 					setPort(port);
-					serverUI.display("Port set to: " + port);
+					NotifyObservers("Port set to: " + port);
 				}catch (NumberFormatException e){
-					serverUI.display("Port could not be set");
+					NotifyObservers("Port could not be set");
 				}
 				break;
 			case "start" :
 				if(isListening())
-					serverUI.display("Server is already listening.");
+					NotifyObservers("Server is already listening.");
 				else {
 					try {							
 						listen();
 					} catch (IOException e) {
-						serverUI.display("Unable to start listening.");
+						NotifyObservers("Unable to start listening.");
 					}
 				}
 				break;
 			case "getport" :
-				serverUI.display("Current Port: " + getPort());				
+				NotifyObservers("Current Port: " + getPort());				
 				break;
 			case "block" :
 				String blockee = message.substring(cmdEnd+1, message.length());				
 
 				if(!users.contains(blockee)){
-					serverUI.display("User " + blockee + " does not exist.");
+					NotifyObservers("User " + blockee + " does not exist.");
 				} else if(blockedClients.contains(blockee)){
-					serverUI.display("Messages from " + blockee + " were already blocked.");					
+					NotifyObservers("Messages from " + blockee + " were already blocked.");					
 				} else {
-					serverUI.display("Messages from " + blockee + " will be blocked.");
+					NotifyObservers("Messages from " + blockee + " will be blocked.");
 					blockedClients.add(blockee);	
 				}
 				break;
 			case "unblock" :
 				if (message.trim().equals("#"+cmd)) { //#unblock all command
 					if (blockedClients.isEmpty()) {
-						serverUI.display("No blocking is in effect.");
+						NotifyObservers("No blocking is in effect.");
 					}else { //
 						for (int i = 0; i < blockedClients.size(); i++) {
-							serverUI.display("Messages from " + blockedClients.get(i) + " will now be displayed.");
+							NotifyObservers("Messages from " + blockedClients.get(i) + " will now be displayed.");
 						}
 						blockedClients.clear();
 					}
@@ -251,25 +257,25 @@ public class EchoServer extends ObservableServer
 					String unBlockee = message.substring(cmdEnd+1, message.length());	
 					if(blockedClients.contains(unBlockee)){
 						blockedClients.remove(unBlockee);
-						serverUI.display("Messages from " + unBlockee + " will now be displayed" );
+						NotifyObservers("Messages from " + unBlockee + " will now be displayed" );
 					}
 					else{
-						serverUI.display("Messages from " + unBlockee + " were not blocked");
+						NotifyObservers("Messages from " + unBlockee + " were not blocked");
 					}
 				}
 
 				break;
 			case "whoiblock" :
 				if (blockedClients.isEmpty()) {
-					serverUI.display("No blocking is in effect.");
+					NotifyObservers("No blocking is in effect.");
 				}else {
 					for (int i = 0; i < blockedClients.size(); i++) {
-						serverUI.display("Messages from " + blockedClients.get(i) + " are blocked.");
+						NotifyObservers("Messages from " + blockedClients.get(i) + " are blocked.");
 					}
 				}
 				break;
 			default: 
-				serverUI.display("Command not recognized.");
+				NotifyObservers("Command not recognized.");
 			}		
 		}
 	}
@@ -280,7 +286,7 @@ public class EchoServer extends ObservableServer
 	 */
 	protected void serverStarted()
 	{
-		serverUI.display("Server listening for connections on port " + getPort());
+		NotifyObservers("Server listening for connections on port " + getPort());
 	}
 
 	/**
@@ -289,7 +295,7 @@ public class EchoServer extends ObservableServer
 	 */
 	protected void serverStopped()
 	{
-		serverUI.display("Server has stopped listening for connections.");
+		NotifyObservers("Server has stopped listening for connections.");
 		sendToAllClients("WARNING - The server has stopped listening for connections");
 	}
 
@@ -301,7 +307,7 @@ public class EchoServer extends ObservableServer
 		client.setInfo("Blocked", new ArrayList<ArrayList<String>>());
 		client.setInfo("status", "online");
 		String msg = "A new client is attempting to connect to the server.";
-		serverUI.display(msg);		
+		NotifyObservers(msg);		
 	}
 
 	/**
@@ -312,7 +318,7 @@ public class EchoServer extends ObservableServer
 		String msg = client.getInfo("loginId") + " has disconnected!";
 		//removeUser((String) client.getInfo("loginId"));
 		if(client.getInfo("loginId") != null){
-			serverUI.display(msg);
+			NotifyObservers(msg);
 			sendToChannel((String) client.getInfo("channel"),msg);		
 		}
 	}
@@ -328,7 +334,7 @@ public class EchoServer extends ObservableServer
 			try {
 				client.sendToClient("ERROR- You have already logged in with user id: " + clientOrigLogin + ".");				
 			} catch (IOException e1) {
-				serverUI.display("ERROR- Unable to send login error message to client: " + clientOrigLogin);
+				NotifyObservers("ERROR- Unable to send login error message to client: " + clientOrigLogin);
 			}
 			return false;
 		}
@@ -347,10 +353,10 @@ public class EchoServer extends ObservableServer
 					//User already existed
 					try {
 						client.sendToClient("Error - The client " + id + " is already logged in.");
-						serverUI.display("A client, " + id + " tried to log in but " + id + " is already logged in.");
+						NotifyObservers("A client, " + id + " tried to log in but " + id + " is already logged in.");
 						client.close();
 					} catch (IOException e) {
-						serverUI.display("ERROR- Unable to send login error message to client: " + id);
+						NotifyObservers("ERROR- Unable to send login error message to client: " + id);
 					}
 					return false;
 				}
@@ -363,11 +369,11 @@ public class EchoServer extends ObservableServer
 			if (!pw.equals(passwords.get(index))) {
 				try {
 					client.sendToClient("Error - The password entered was incorrect. Please try again.");
-					serverUI.display("A client, " + id + " tried to log in with the wrong password.");
+					NotifyObservers("A client, " + id + " tried to log in with the wrong password.");
 					client.close();
 					return false;
 				} catch (IOException e) {
-					serverUI.display("ERROR- Unable to send login error message to client: " + id);
+					NotifyObservers("ERROR- Unable to send login error message to client: " + id);
 				}
 
 			}else {
@@ -379,7 +385,7 @@ public class EchoServer extends ObservableServer
 				client.setInfo("channel", "public");
 
 				sendToChannel("public", id + " has logged on.");
-				serverUI.display(id + " has logged on.");
+				NotifyObservers(id + " has logged on.");
 
 				return  true;
 			}
@@ -396,7 +402,7 @@ public class EchoServer extends ObservableServer
 		client.setInfo("channel", "public");
 
 		sendToChannel("public", id + " has logged on.");
-		serverUI.display(id + " has logged on.");
+		NotifyObservers(id + " has logged on.");
 
 		return  true;
 	}
@@ -421,7 +427,7 @@ public class EchoServer extends ObservableServer
 				try {
 					conn.sendToClient(msg);
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 			}
 		}
@@ -438,19 +444,19 @@ public class EchoServer extends ObservableServer
 			try {
 				client.sendToClient("You cannot block the sending of messages to yourself.");
 			} catch (IOException e) {
-				serverUI.display("ERROR - Failed to send message to client " + blocker);
+				NotifyObservers("ERROR - Failed to send message to client " + blocker);
 			}
 		} else if (!UserExists(blockee)){
 			try {
 				client.sendToClient("User " + blockee + " does not exist");
 			} catch (IOException e) {
-				serverUI.display("ERROR - Failed to send message to client " + blocker);
+				NotifyObservers("ERROR - Failed to send message to client " + blocker);
 			}
 		} else if(blocked.contains(blockee)){
 			try {
 				client.sendToClient("Messages from " + blockee + " were already blocked.");
 			} catch (IOException e) {
-				serverUI.display("ERROR - Failed to send message to client " + blocker);
+				NotifyObservers("ERROR - Failed to send message to client " + blocker);
 			}
 		} else if (blocker.length() > 0){
 			try {
@@ -477,7 +483,7 @@ public class EchoServer extends ObservableServer
 					client.setInfo("Blocked", blocked);
 				}
 			} catch (IOException e) {
-				serverUI.display("ERROR - Failed to send message to client " + blocker);
+				NotifyObservers("ERROR - Failed to send message to client " + blocker);
 			}
 		}
 	}
@@ -489,19 +495,19 @@ public class EchoServer extends ObservableServer
 			try {
 				client.sendToClient("ERROR - You cannot monitor your own chat.");
 			} catch (IOException e) {
-				serverUI.display("ERROR - Failed to send message to client");
+				NotifyObservers("ERROR - Failed to send message to client");
 			}
 		} else if(!UserExists(monitor)){
 			try {
 				client.sendToClient("ERROR - User to monitor chat must exist.");
 			} catch (IOException e) {
-				serverUI.display("ERROR - Failed to send message to client");
+				NotifyObservers("ERROR - Failed to send message to client");
 			}
 		} else {
 			try {
 				client.sendToClient("#meeting " + monitor);
 			} catch (IOException e) {
-				serverUI.display("ERROR - Failed to send message to client");
+				NotifyObservers("ERROR - Failed to send message to client");
 			}
 			SendMessageToClient(client, GetClientConnection(monitor), client.getInfo("loginId") + " is in a meeting and has selected you to monitor their chat. You will now receive all of " + client.getInfo("loginId") + "'s messages"); 
 		}		
@@ -519,7 +525,7 @@ public class EchoServer extends ObservableServer
 				try {
 					client.sendToClient("No blocking is in effect.");
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 			}else { //
 				ArrayList<String> blocks = GetBlocks(client);
@@ -529,7 +535,7 @@ public class EchoServer extends ObservableServer
 						if( blocks.get(i).equals("server"))
 							serverMuteUsers.remove(client.getInfo("loginId"));
 					} catch (IOException e) {
-						serverUI.display("Message could not be sent to the client.");
+						NotifyObservers("Message could not be sent to the client.");
 					}
 				}
 				client.setInfo("Blocked", new ArrayList<String>());
@@ -543,13 +549,13 @@ public class EchoServer extends ObservableServer
 					if( unBlockee.equals("server"))
 						serverMuteUsers.remove("server");
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 			}else {
 				try {
 					client.sendToClient("Messages from " + unBlockee + " were not blocked");
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 			}
 		}		
@@ -564,14 +570,14 @@ public class EchoServer extends ObservableServer
 			try {
 				client.sendToClient("No blocking is in effect.");
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to the client.");
+				NotifyObservers("Message could not be sent to the client.");
 			}
 		}else {
 			for (int i = 0; i < iBlocked.size(); i++) {
 				try {
 					client.sendToClient("Messages from " + iBlocked.get(i) + " are blocked.");
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 			}
 		}
@@ -587,7 +593,7 @@ public class EchoServer extends ObservableServer
 			try {
 				client.sendToClient("Messages to " + ((ConnectionToClient) (blockedMe.get(i))).getInfo("loginId") + " are being blocked.");
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to the client.");
+				NotifyObservers("Message could not be sent to the client.");
 			}
 		}		
 	}
@@ -649,7 +655,7 @@ public class EchoServer extends ObservableServer
 						try {
 							client.sendToClient("You are not authorized to get information about channel " + statuseeName);
 						} catch (IOException e) {
-							serverUI.display("Unable to send status messasge to user.");
+							NotifyObservers("Unable to send status messasge to user.");
 						}
 						return;
 					}
@@ -658,7 +664,7 @@ public class EchoServer extends ObservableServer
 					try {
 						client.sendToClient("User " + tempClient.getInfo("loginId") + " is " + tempClient.getInfo("status") +".");
 					} catch (IOException e) {
-						serverUI.display("Unable to send status messasge to user.");
+						NotifyObservers("Unable to send status messasge to user.");
 					}
 				}
 			}
@@ -666,7 +672,7 @@ public class EchoServer extends ObservableServer
 				try {
 					client.sendToClient("Channel " + statuseeName + " does not exist.");
 				} catch (IOException e) {
-					serverUI.display("Unable to send status messasge to user.");
+					NotifyObservers("Unable to send status messasge to user.");
 				}
 			}
 
@@ -677,13 +683,13 @@ public class EchoServer extends ObservableServer
 				try {
 					client.sendToClient("User " + statuseeName + " is " + (String) statusee.getInfo("status")  + ".");
 				} catch (IOException e) {
-					serverUI.display("Unable to send status messasge to user.");
+					NotifyObservers("Unable to send status messasge to user.");
 				}
 			} else {
 				try {
 					client.sendToClient("User " + statuseeName + " is offline.");
 				} catch (IOException e) {
-					serverUI.display("Unable to send status messasge to user.");
+					NotifyObservers("Unable to send status messasge to user.");
 				}
 			}
 		}
@@ -699,7 +705,7 @@ public class EchoServer extends ObservableServer
 				client.sendToClient("Your status has been set to unavailable");
 			}	
 		} catch (IOException e) {
-			serverUI.display("Unable to send message to client.");
+			NotifyObservers("Unable to send message to client.");
 		}		
 	}
 
@@ -711,7 +717,7 @@ public class EchoServer extends ObservableServer
 			try {
 				client.sendToClient("You cannot be added to new channels while you are unavailable");
 			} catch (IOException e) {
-				serverUI.display("ERROR- Unable to send message to client: " + client.getInfo("loginId"));
+				NotifyObservers("ERROR- Unable to send message to client: " + client.getInfo("loginId"));
 			}
 		} else {
 			String newChannel = message.substring(message.indexOf(' ')+1, message.length());
@@ -719,7 +725,7 @@ public class EchoServer extends ObservableServer
 			try {
 				client.sendToClient("Channel has been set to: " + newChannel);
 			} catch (IOException e) {
-				serverUI.display("ERROR- Unable to send message to client: " + client.getInfo("loginId"));
+				NotifyObservers("ERROR- Unable to send message to client: " + client.getInfo("loginId"));
 			}
 		}
 	}
@@ -771,7 +777,7 @@ public class EchoServer extends ObservableServer
 			try {
 				sender.sendToClient("ERROR - You cannot forward your own chat to yourself.");
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to client.");
+				NotifyObservers("Message could not be sent to client.");
 			}
 			return;
 		}
@@ -779,7 +785,7 @@ public class EchoServer extends ObservableServer
 			try {
 				sender.sendToClient("Cannot forward to " + recipient + " because " + recipient + " does not exist.");
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to client.");
+				NotifyObservers("Message could not be sent to client.");
 			}
 			return;
 		}
@@ -787,7 +793,7 @@ public class EchoServer extends ObservableServer
 			try {
 				sender.sendToClient("Cannot forward to " + recipient + " because " + recipient + " is blocking messages from you.");
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to client.");
+				NotifyObservers("Message could not be sent to client.");
 			}
 			return;
 		}
@@ -796,14 +802,14 @@ public class EchoServer extends ObservableServer
 			try {
 				sender.sendToClient("Cannot forward to " + recipient + " because " + recipient + " is unavailable.");
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to client.");
+				NotifyObservers("Message could not be sent to client.");
 			}
 			return;
 		}
 		try {
 			sender.sendToClient("#forward " + recipient);
 		} catch (IOException e) {
-			serverUI.display("ERROR - Failed to send message to client");
+			NotifyObservers("ERROR - Failed to send message to client");
 		}
 		sender.setInfo("Monitor", recipient);
 		SendMessageToClient(sender, recip, sender.getInfo("loginId") + " is forwarding their messages to you."); 
@@ -825,7 +831,7 @@ public class EchoServer extends ObservableServer
 				msg = msg.substring(msg.indexOf('>') + 2, msg.length());
 				GetClientConnection(recipient).sendToClient((String) client.getInfo("loginId") + "> " + origSender + "> " + msg);
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to client.");
+				NotifyObservers("Message could not be sent to client.");
 			}
 		}
 
@@ -837,7 +843,7 @@ public class EchoServer extends ObservableServer
 			client.sendToClient("#endforward");
 			client.setInfo("Monitor", null);
 		} catch (IOException e) {
-			serverUI.display("Message could not be sent to the client.");
+			NotifyObservers("Message could not be sent to the client.");
 		}
 	}
 
@@ -858,7 +864,7 @@ public class EchoServer extends ObservableServer
 					//available, not blocked, and in same channel
 					recipClient.sendToClient(msg);
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 			}
 		}
@@ -878,7 +884,7 @@ public class EchoServer extends ObservableServer
 				try {
 					sender.sendToClient("You cannot send a private message to yourself.");
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 				return;
 			}
@@ -886,7 +892,7 @@ public class EchoServer extends ObservableServer
 				try {
 					sender.sendToClient("You cannot send a private message to a user that does not exist.");
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 				return;
 			}
@@ -894,7 +900,7 @@ public class EchoServer extends ObservableServer
 				try {
 					sender.sendToClient("Cannot send message because " + recipient + " is not available.");
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 				return;
 			}
@@ -904,21 +910,21 @@ public class EchoServer extends ObservableServer
 				try {
 					sender.sendToClient("Cannot send message because " + recipient + " is blocking messages from you.");
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 			}else {
 				SendMessageToClient(sender, GetClientConnection(recipient), msg);
 				try {
 					sender.sendToClient(sender.getInfo("loginId") + "> " + msg);
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 			}
 		} else {
 			try {
 				sender.sendToClient("You can not send a private message while your status is unavailable");
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to the client.");
+				NotifyObservers("Message could not be sent to the client.");
 			}
 		}
 
@@ -938,7 +944,7 @@ public class EchoServer extends ObservableServer
 				try {
 					conn.sendToClient(msg);
 				} catch (IOException e) {
-					serverUI.display("Message could not be sent to the client.");
+					NotifyObservers("Message could not be sent to the client.");
 				}
 			}
 		}
@@ -951,7 +957,7 @@ public class EchoServer extends ObservableServer
 			try {
 				sender.sendToClient("ERROR- User " + recipient + " does not exist.");
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to client.");
+				NotifyObservers("Message could not be sent to client.");
 			}
 			return;
 		}
@@ -962,7 +968,7 @@ public class EchoServer extends ObservableServer
 				recipient.sendToClient(sender.getInfo("loginId") + "> " + msg);
 				//sender.sendToClient(sender.getInfo("loginId") + "> " + msg);
 			} catch (IOException e) {
-				serverUI.display("Message could not be sent to client.");
+				NotifyObservers("Message could not be sent to client.");
 			}
 		}
 	}
@@ -1002,7 +1008,7 @@ public class EchoServer extends ObservableServer
 				}
 			}
 		} catch (IOException e) {
-			serverUI.display("Error - Could not creat account file.");
+			NotifyObservers("Error - Could not creat account file.");
 		}
 	}
 	
