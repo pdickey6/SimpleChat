@@ -91,13 +91,15 @@ public class ClientGUI implements Observer{
 			//System.exit(1);
 		}
 
-		client.addObserver(this);
+		try {
+			client.addObserver(this);
+		}catch (Exception e) {
+			//server not started
+			JOptionPane.showMessageDialog(null, "Error: Could not connect to server.  Make sure server is started and try again");
+			System.exit(0);
+		}
 		SetupUI(loginID);
 		self = this;
-	}
-
-	public ClientGUI() {
-		LoginGUI login = new LoginGUI();
 	}
 
 	private void SetupUI(String loginID) {
@@ -720,7 +722,7 @@ public class ClientGUI implements Observer{
 
 	protected static void createAndShowGUI(String[] args) {
 		@SuppressWarnings("unused")
-		ClientGUI chatWindow = new ClientGUI();
+		LoginGUI login = new LoginGUI();
 	}
 
 	@Override
