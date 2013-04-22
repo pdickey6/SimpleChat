@@ -203,31 +203,31 @@ public class GUI implements Observer{
 
 		javax.swing.GroupLayout gl_ChatSettingsTab = new javax.swing.GroupLayout(ChatSettingsTab);
 		gl_ChatSettingsTab.setHorizontalGroup(
-			gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING)
+				gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_ChatSettingsTab.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING)
-						.addComponent(ChannelToSetTo, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-						.addComponent(ForwardTo, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
-					.addGap(18)
-					.addGroup(gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(SetChannelButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(ForwardButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-					.addGap(139))
-		);
+						.addContainerGap()
+						.addGroup(gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING)
+								.addComponent(ChannelToSetTo, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+								.addComponent(ForwardTo, GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
+								.addGap(18)
+								.addGroup(gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(SetChannelButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(ForwardButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+										.addGap(139))
+				);
 		gl_ChatSettingsTab.setVerticalGroup(
-			gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING)
+				gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_ChatSettingsTab.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_ChatSettingsTab.createParallelGroup(Alignment.BASELINE)
-						.addComponent(ForwardTo, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
-						.addComponent(ForwardButton))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING)
-						.addComponent(SetChannelButton)
-						.addComponent(ChannelToSetTo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(406, Short.MAX_VALUE))
-		);
+						.addContainerGap()
+						.addGroup(gl_ChatSettingsTab.createParallelGroup(Alignment.BASELINE)
+								.addComponent(ForwardTo, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE)
+								.addComponent(ForwardButton))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_ChatSettingsTab.createParallelGroup(Alignment.LEADING)
+										.addComponent(SetChannelButton)
+										.addComponent(ChannelToSetTo, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+										.addContainerGap(406, Short.MAX_VALUE))
+				);
 		ChatSettingsTab.setLayout(gl_ChatSettingsTab);
 
 		SettingsWindowTabs.addTab("Chat", ChatSettingsTab);
@@ -247,34 +247,34 @@ public class GUI implements Observer{
 
 		javax.swing.GroupLayout gl_BlockSettingsTab = new javax.swing.GroupLayout(BlockSettingsTab);
 		gl_BlockSettingsTab.setHorizontalGroup(
-			gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING)
+				gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_BlockSettingsTab.createSequentialGroup()
-					.addContainerGap()
-					.addComponent(UserToChangeBlock, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(WhoIBlockButton, 0, 0, Short.MAX_VALUE)
-						.addComponent(BlockButton, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING, false)
-						.addComponent(UnblockButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(WhoBlocksMeButton, GroupLayout.PREFERRED_SIZE, 133, Short.MAX_VALUE))
-					.addContainerGap(117, Short.MAX_VALUE))
-		);
+						.addContainerGap()
+						.addComponent(UserToChangeBlock, GroupLayout.PREFERRED_SIZE, 135, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(ComponentPlacement.RELATED)
+						.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(WhoIBlockButton, 0, 0, Short.MAX_VALUE)
+								.addComponent(BlockButton, GroupLayout.DEFAULT_SIZE, 118, Short.MAX_VALUE))
+								.addPreferredGap(ComponentPlacement.UNRELATED)
+								.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING, false)
+										.addComponent(UnblockButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+										.addComponent(WhoBlocksMeButton, GroupLayout.PREFERRED_SIZE, 133, Short.MAX_VALUE))
+										.addContainerGap(117, Short.MAX_VALUE))
+				);
 		gl_BlockSettingsTab.setVerticalGroup(
-			gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING)
+				gl_BlockSettingsTab.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_BlockSettingsTab.createSequentialGroup()
-					.addContainerGap()
-					.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.BASELINE)
-						.addComponent(UserToChangeBlock, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(BlockButton)
-						.addComponent(UnblockButton))
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.BASELINE)
-						.addComponent(WhoIBlockButton)
-						.addComponent(WhoBlocksMeButton))
-					.addContainerGap(367, Short.MAX_VALUE))
-		);
+						.addContainerGap()
+						.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.BASELINE)
+								.addComponent(UserToChangeBlock, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(BlockButton)
+								.addComponent(UnblockButton))
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addGroup(gl_BlockSettingsTab.createParallelGroup(Alignment.BASELINE)
+										.addComponent(WhoIBlockButton)
+										.addComponent(WhoBlocksMeButton))
+										.addContainerGap(367, Short.MAX_VALUE))
+				);
 		BlockSettingsTab.setLayout(gl_BlockSettingsTab);
 
 		SettingsWindowTabs.addTab("Block", BlockSettingsTab);
@@ -331,20 +331,20 @@ public class GUI implements Observer{
 		SettingsWindowTabs.addTab("Server", ServerSettingsTab);
 
 		javax.swing.GroupLayout SettingsWindowLayout = new javax.swing.GroupLayout(SettingsWindow);
-		SettingsWindow.setLayout(SettingsWindowLayout);
 		SettingsWindowLayout.setHorizontalGroup(
-				SettingsWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				SettingsWindowLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(SettingsWindowLayout.createSequentialGroup()
 						.addContainerGap()
-						.addComponent(SettingsWindowTabs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-						.addContainerGap(11, Short.MAX_VALUE))
-				);
-		SettingsWindowLayout.setVerticalGroup(
-				SettingsWindowLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(SettingsWindowLayout.createSequentialGroup()
-						.addComponent(SettingsWindowTabs, javax.swing.GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
+						.addComponent(SettingsWindowTabs, GroupLayout.DEFAULT_SIZE, 431, Short.MAX_VALUE)
 						.addContainerGap())
 				);
+		SettingsWindowLayout.setVerticalGroup(
+				SettingsWindowLayout.createParallelGroup(Alignment.LEADING)
+				.addGroup(SettingsWindowLayout.createSequentialGroup()
+						.addComponent(SettingsWindowTabs, GroupLayout.DEFAULT_SIZE, 497, Short.MAX_VALUE)
+						.addContainerGap())
+				);
+		SettingsWindow.setLayout(SettingsWindowLayout);
 
 		MainWindowTabs.addTab("Settings", SettingsWindow);
 
@@ -401,7 +401,7 @@ public class GUI implements Observer{
 				}
 			}
 		});
-
+		
 		SetPortButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String command = SetPortButton.getActionCommand();
@@ -409,6 +409,7 @@ public class GUI implements Observer{
 					//get new port
 					String port = PortInput.getText();
 					if(port.length() > 0 ){
+						client.connectionClosed();
 						client.handleMessageFromClientUI("#setport " + port);
 						MainWindowTabs.setSelectedIndex(0);
 						PortInput.setText("");
@@ -434,6 +435,7 @@ public class GUI implements Observer{
 					//get new host
 					String host = HostInput.getText();
 					if(host.length() > 0 ){
+						client.connectionClosed();
 						client.handleMessageFromClientUI("#sethost " + host);
 						MainWindowTabs.setSelectedIndex(0);
 						HostInput.setText("");
@@ -548,7 +550,7 @@ public class GUI implements Observer{
 				}
 			}
 		});
-		
+
 
 
 
