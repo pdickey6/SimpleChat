@@ -722,7 +722,7 @@ public class ClientGUI implements Observer{
 
 	protected static void createAndShowGUI(String[] args) {
 		@SuppressWarnings("unused")
-		LoginGUI login = new LoginGUI();
+		LoginGUI login = new LoginGUI(false);
 	}
 
 	@Override
@@ -756,6 +756,13 @@ public class ClientGUI implements Observer{
 			} else if (message.startsWith("#linedraw")){
 				drawPad.updateDraw( message);
 				return;
+			} else if (message.startsWith("Login Error:")){				
+				java.awt.EventQueue.invokeLater(new Runnable() {
+					public void run() {
+						chatFrame.setVisible(false);
+						LoginGUI login = new LoginGUI(true);						
+					}
+				});				
 			}
 
 			if(!message.substring( message.length()-1, message.length()).equals("\n"))

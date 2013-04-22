@@ -173,17 +173,7 @@ public class EchoServer extends ObservableServer
 			//Switch based on user command
 			switch (cmd) {
 			case "quit" :
-				/*if(!){
-					try {
-						//send msg before closing
-						sendToAllClients("WARNING - The server has closed. Awaiting command.");
-						close();
-					} catch (IOException e) {
-						NotifyObservers("Unable to close.");
-					}
-				}*/
 				System.exit(0);
-
 				break;
 			case "stop" :
 				if(!isListening())
@@ -193,9 +183,6 @@ public class EchoServer extends ObservableServer
 				}
 				break;
 			case "close" :
-				/*				if(isClosed())
-					NotifyObservers("Server is already closed");
-				else {*/
 				try{
 					sendToAllClients("SERVER SHUTTING DOWN! DISCONNECTING!");
 					sendToAllClients("Abnormal termination of connection");
@@ -335,21 +322,14 @@ public class EchoServer extends ObservableServer
 			}
 			return false;
 		}
-		//try{
-		//Thread[] clients = this.getClientConnections();
-		//for(int i = 0; i < clients.length; i++){
-		//for (int i = 0; i < accounts.size(); i++) {
-		//if(((ConnectionToClient)clients[i]).getInfo("loginId").equals(id)){
 
-		//}
-		//} catch (RuntimeException e){} //Catches when there are no clients to getClientConnections
 		try{
 			Thread[] clients = this.getClientConnections();
 			for(int i = 0; i < clients.length; i++){
 				if(((ConnectionToClient)clients[i]).getInfo("loginId").equals(id)){
 					//User already existed
 					try {
-						client.sendToClient("Error - The client " + id + " is already logged in.");
+						client.sendToClient("Login Error: The client " + id + " is already logged in.");
 						NotifyObservers("A client, " + id + " tried to log in but " + id + " is already logged in.");
 						client.close();
 					} catch (IOException e) {
@@ -365,7 +345,7 @@ public class EchoServer extends ObservableServer
 			int index = users.indexOf(id);
 			if (!pw.equals(passwords.get(index))) {
 				try {
-					client.sendToClient("Error - The password entered was incorrect. Please try again.");
+					client.sendToClient("Login Error: The password entered was incorrect. Please try again.");
 					NotifyObservers("A client, " + id + " tried to log in with the wrong password.");
 					client.close();
 					return false;
