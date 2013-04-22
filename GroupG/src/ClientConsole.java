@@ -1,7 +1,6 @@
-// This file contains material supporting section 3.7 of the textbook:
-// "Object Oriented Software Engineering" and is issued under the open-source
-// license found at www.lloseng.com 
-//Edited by Patrick Dickey and Sean Jergensen
+//Patrick Dickey
+//Sean Jergensen
+//P3 CS 345
 
 import java.io.*;
 import java.util.Observable;
@@ -147,6 +146,5 @@ public class ClientConsole implements Observer
 			System.out.println( arg.toString());
 		}		
 	}
-
 }
 //End of ConsoleChat class

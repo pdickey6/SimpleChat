@@ -1,12 +1,13 @@
-// This file contains material supporting section 3.7 of the textbook:
-// "Object Oriented Software Engineering" and is issued under the open-source
-// license found at www.lloseng.com 
-//Edited by Patrick Dickey and Sean Jergensen
+//Patrick Dickey
+//Sean Jergensen
+//P3 CS 345
 
 package client;
 
 import com.lloseng.ocsf.client.*;
 import common.*;
+import drawpad.OpenDrawPad;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Observer;
@@ -63,10 +64,8 @@ public class ChatClient extends ObservableClient
 			sendToServer("#login " + loginId + " " + password);
 		} catch (IOException e) {
 			NotifyObservers("ERROR - No login ID specified. Connection aborted.");
-			//clientUI.display("ERROR - No login ID specified. Connection aborted.");
 		}
 	}
-
 
 	//Instance methods ************************************************
 	private void NotifyObservers(String message) {
@@ -138,7 +137,11 @@ public class ChatClient extends ObservableClient
 					break;
 				}
 			default:
-				NotifyObservers("Command from server not recognized. " + cmd);
+				if(message.startsWith("#linedraw")){
+					NotifyObservers(message);
+				} else {
+					NotifyObservers("Command from server not recognized. " + cmd);
+				}
 			}
 		}
 	}
@@ -309,7 +312,7 @@ public class ChatClient extends ObservableClient
 				} catch (IOException e) {
 					NotifyObservers("Could not stop forwarding messages.");
 				}
-				break;
+				break;			
 			default: 				
 				NotifyObservers("Command not recognized.");
 			}
@@ -360,7 +363,7 @@ public class ChatClient extends ObservableClient
 		return isForwarding;
 	}
 
-	public String getMonitor() {
+	public String getMonitor(){
 		return monitor;
 	}
 

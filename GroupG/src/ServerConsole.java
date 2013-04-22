@@ -1,4 +1,6 @@
-//Edited by Patrick Dickey and Sean Jergensen
+//Patrick Dickey
+//Sean Jergensen
+//P3 CS 345
 
 import java.io.*;
 import java.util.Observable;

@@ -1,7 +1,6 @@
-// This file contains material supporting section 3.7 of the textbook:
-// "Object Oriented Software Engineering" and is issued under the open-source
-// license found at www.lloseng.com 
-//Edited by Patrick Dickey and Sean Jergensen
+//Patrick Dickey
+//Sean Jergensen
+//P3 CS 345
 
 import java.io.*;
 import java.util.ArrayList;
@@ -77,8 +76,6 @@ public class EchoServer extends ObservableServer
 		UpdateTimer.scheduleAtFixedRate(StatusTask, 0, 10000);
 		this.buildUserList(port);
 
-		//setConnectionFactory(new ChatConnectionFactory());
-
 		try {
 			this.listen();
 		} catch (IOException e) {
@@ -110,8 +107,10 @@ public class EchoServer extends ObservableServer
 		String message = msg.toString();
 		if(blockedClients.contains(client.getInfo("loginId")) && !message.startsWith("#")) {
 			return;
-		}
-		else{
+		} else if(message.startsWith("#linedraw")){
+			sendToAllClients(message);
+			return;
+		} else{
 			NotifyObservers("Message received: " + message + " from " + client.getInfo("loginId"));
 		}
 
@@ -158,8 +157,6 @@ public class EchoServer extends ObservableServer
 		}	
 	}
 
-
-
 	/**
 	 * This method handles incoming messages from the server UI
 	 */
@@ -196,16 +193,16 @@ public class EchoServer extends ObservableServer
 				}
 				break;
 			case "close" :
-/*				if(isClosed())
+				/*				if(isClosed())
 					NotifyObservers("Server is already closed");
 				else {*/
-					try{
-						sendToAllClients("SERVER SHUTTING DOWN! DISCONNECTING!");
-						sendToAllClients("Abnormal termination of connection");
-						close();
-					} catch (IOException e){
-						NotifyObservers("Unable to close.");
-					}
+				try{
+					sendToAllClients("SERVER SHUTTING DOWN! DISCONNECTING!");
+					sendToAllClients("Abnormal termination of connection");
+					close();
+				} catch (IOException e){
+					NotifyObservers("Unable to close.");
+				}
 				/*}*/
 				break;
 			case "setport" :
@@ -389,8 +386,6 @@ public class EchoServer extends ObservableServer
 
 				return  true;
 			}
-
-
 		}
 		//first unique login for client
 		client.setInfo("loginId", id);
@@ -431,7 +426,6 @@ public class EchoServer extends ObservableServer
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -581,7 +575,6 @@ public class EchoServer extends ObservableServer
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -834,8 +827,6 @@ public class EchoServer extends ObservableServer
 				NotifyObservers("Message could not be sent to client.");
 			}
 		}
-
-
 	}
 
 	private void endForward(ConnectionToClient client) {
@@ -1011,7 +1002,7 @@ public class EchoServer extends ObservableServer
 			NotifyObservers("Error - Could not creat account file.");
 		}
 	}
-	
+
 	public static void main(String[] args) 
 	{
 		//Get port
