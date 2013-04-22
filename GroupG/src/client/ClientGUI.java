@@ -96,6 +96,10 @@ public class ClientGUI implements Observer{
 		self = this;
 	}
 
+	public ClientGUI() {
+		LoginGUI login = new LoginGUI();
+	}
+
 	private void SetupUI(String loginID) {
 		chatFrame = new JFrame("Chat " + loginID);
 		PrivateMessageDialog = new JDialog(chatFrame,true);
@@ -145,7 +149,6 @@ public class ClientGUI implements Observer{
 
 		chatFrame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		chatFrame.setBackground(new java.awt.Color(52, 73, 94));
-		chatFrame.setResizable(false);
 
 		MainWindowTabs.setBackground(new java.awt.Color(44, 62, 80));
 		MainWindowTabs.setOpaque(true);
@@ -716,42 +719,8 @@ public class ClientGUI implements Observer{
 	}
 
 	protected static void createAndShowGUI(String[] args) {
-		//Get loginId
-		String id = "";
-		try {
-			id = args[0];
-		} catch(ArrayIndexOutOfBoundsException e) {
-			System.out.println("ERROR - No login ID specified. Connection aborted.");
-			System.exit(0);
-		}
-
-		//Get loginId
-		String pw = "";
-		try {
-			pw = args[1];
-		} catch(ArrayIndexOutOfBoundsException e) {
-			System.out.println("ERROR - No password specified. Connection aborted.");
-			System.exit(0);
-		}
-
-		//Get host
-		String host = "";
-		try {
-			host = args[2];
-		} catch(ArrayIndexOutOfBoundsException e) {
-			host = "localhost";
-		}
-
-		//Get port
-		int port = 0;
-		try {
-			port = Integer.parseInt(args[3]); 
-		} catch(Throwable t) {
-			port = DEFAULT_PORT; //Set port to 5555
-		}
-
 		@SuppressWarnings("unused")
-		ClientGUI chatWindow = new ClientGUI(id, pw, host, port);
+		ClientGUI chatWindow = new ClientGUI();
 	}
 
 	@Override
